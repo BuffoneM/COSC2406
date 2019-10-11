@@ -14,7 +14,7 @@ INCLUDE Irvine32.inc
 ;----------Main Code Section------------------------------------
 .code
 main PROC
-
+	mov edx, OFFSET pPrompt						; Print msg and collect pVar
 main ENDP
 
 ;***************************************************************
