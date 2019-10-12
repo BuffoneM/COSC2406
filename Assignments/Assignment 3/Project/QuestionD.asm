@@ -11,9 +11,11 @@ TITLE QuestionD.asm
 INCLUDE Irvine32.inc
 
 .data
-array DWORD 4 DUP(?)
+array DWORD 10 DUP(?)
 
 prompt BYTE "Enter a number: ", 0
+
+prevNum DWORD 0									; Used when re-indexing the array
 
 
 ;----------Main Code Section------------------------------------
@@ -33,6 +35,7 @@ L1:
 	mov [edi], eax								; Store the inputted value into edi
 	add edi, ebx								; Proceed to the next index
 	loop L1
+	call CrlF
 
 
 	mov ecx, LENGTHOF array						; Reset ECX back to 4 for the printArray function
@@ -43,14 +46,29 @@ L1:
 ;	****** Re-index the Array ******
 	mov edi, OFFSET array						; EDI = address of the array
 	mov ecx, LENGTHOF array						; Reset ECX back to 4 for the index change
+	
+	mov eax, [edi]								; Store array[0] in prevNum
+	mov prevNum, eax
+	add edi, ebx								; Go to the next element
+	dec ecx
 L2:
-	add edi, ebx
+	mov eax, [edi]								; Move array[i] into eax (the upcoming number)
+	mov edx, prevNum
+	mov [edi], edx								; Set the current value in the array to the previous number
+	mov prevNum, eax							; Set the prevNum to be the next number to be moved over
+	add edi, ebx								; Go to the next element
 	loop L2
 
+	mov edi, OFFSET array						; EDI = address of the array
+	mov edx, prevNum
+	mov [edi], edx								; Move the last prevNum (last number in the array) to be the first element in the array
 
+;   ****** Print the final array ******
 	mov ecx, LENGTHOF array						; Reset ECX back to 4 for the printArray function
 	call printArray
 	call CrlF
+
+	exit
 main ENDP
 
 ;*************************************************************
@@ -81,7 +99,6 @@ L1:
 	call WriteChar
 	call CrlF
 	ret
-
 printArray ENDP
 
 END main
