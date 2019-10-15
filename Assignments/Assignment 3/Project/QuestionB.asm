@@ -11,14 +11,14 @@ INCLUDE Irvine32.inc
 
 .data
 
-num DWORD 4
-wArray SWORD 4 DUP(0)
-dwArray SDWORD 4 DUP(0)
+NUM = 10								; symbolic onstant
+wArray SWORD NUM DUP(0)
+dwArray SDWORD NUM DUP(0)
 
 prompt BYTE "Enter a signed integer: ", 0
-wArrayTxt BYTE "WORD array:  ", 0
 dwArrayTxt BYTE "DWORD array: ", 0
 
+comma BYTE ", ", 0						; used for array printing
 
 ;----------Main Code Section------------------------------------
 .code
@@ -50,58 +50,41 @@ L2:
 	add edi, ebx						; go to the next element of the dWORD array
 	add edx, eax						; go to the next element of the WORD array
 	loop L2
-	
-; Print the WORD array
-	mov esi, OFFSET wArray				; move appropiate values to the registers for printArray
-	mov ebx, TYPE wArray
-	mov ecx, LENGTHOF wArray
-	call CrlF
-	
-	mov edx, OFFSET wArrayTxt			; call word array text statement
-	call WriteString
-	call printArray
 
-; Print the DWORD array
+;	******Print the DWORD array******
 	mov esi, OFFSET dwArray				; move appropiate values to the registers for printArray
 	mov ebx, TYPE dwArray
 	mov ecx, LENGTHOF dwArray
 
 	mov edx, OFFSET dwArrayTxt			; call dword array text statement
 	call WriteString
-	call printArray
-	
-	exit
-main ENDP
 
-;*************************************************************
-printArray PROC USES ecx ebx esi
+;   ****** Print array ******
 ;	RECEIVES: ESI = offset of the source array
 ;			  EBX = type of the source
 ;			  ECX = number of elements in the source
-;*************************************************************
-.data
-	comma BYTE ", ", 0
+;	*************************************************************
 
-.code
 	mov al, '['							; print the opening bracket of the array
 	call WriteChar
 	dec ecx								; decrease the loop amount of ecx by one so you can print the last elements without a comma
 
-L1:
+L3:
 	movsx eax, WORD PTR[esi]			; print the next value of the array into ax
 	call WriteInt						
 	mov edx, OFFSET comma				; write the comma and space for the next value
 	call WriteString
 	add esi, ebx						; go to the next element
-	loop L1								; end of the loop
+	loop L3								; end of the loop
 	
 	movsx eax, WORD PTR[esi]			; print the last value of the array into ax
 	call WriteInt
-	mov al, ']'							; print the last bracket and end the print function
+	mov al, ']'							; print the last bracket
 	call WriteChar
-	call CrlF
-	ret
-printArray ENDP
+	call CrlF							; end of print array
+	
+	exit
+main ENDP
 
 END main
 

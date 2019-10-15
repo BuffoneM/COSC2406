@@ -9,23 +9,6 @@ TITLE QuestionA.asm
 ;***************************************************************
 INCLUDE Irvine32.inc
 
-COMMENT !
-		// PSEUDO CODE
-		System.out.println("Enter a number: ");
-		int input = in.nextInt();
-		
-		DWORD source = input;
-		DWORD target = [source];
-		
-		System.out.println(source.binary);
-		System.out.println(source.hex);
-		System.out.println(source.signedInt);
-
-		System.out.println(target.binary);
-		System.out.println(target.hex);
-		System.out.println(target.signedInt);
-END COMMENT !
-
 .data
 prompt BYTE "Enter an integer: ", 0
 sourceText BYTE "Source:", 0
@@ -46,7 +29,8 @@ main PROC
 	call WriteString
 	call ReadInt
 	mov source, eax
-	mov target, eax
+	mov ebx, source
+	mov target, ebx
 	call CrlF
 
 	; *****Print Source*****

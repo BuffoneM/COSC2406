@@ -35,6 +35,8 @@ prompt BYTE "Enter a number: ", 0
 
 prevNum DWORD 0									; Used when re-indexing the array
 
+comma BYTE ", ", 0
+
 
 ;----------Main Code Section------------------------------------
 .code
@@ -53,11 +55,6 @@ L1:
 	mov [edi], eax								; Store the inputted value into edi
 	add edi, ebx								; Proceed to the next index
 	loop L1
-	call CrlF
-
-
-	mov ecx, LENGTHOF array						; Reset ECX back to 4 for the printArray function
-	call printArray
 	call CrlF
 
 
@@ -82,41 +79,35 @@ L2:
 	mov [edi], edx								; Move the last prevNum (last number in the array) to be the first element in the array
 
 ;   ****** Print the final array ******
-	mov ecx, LENGTHOF array						; ECX = amount of elements in the array
-	call printArray
+	mov esi, OFFSET array
+	mov ebx, TYPE array
+	mov ecx, LENGTHOF array	
+
+;   ****** Print array ******
+;	RECEIVES: ESI = offset of the source array
+;			  EBX = type of the source
+;			  ECX = number of elements in the source
+;	*************************************************************
+	mov al, '['									; print the opening bracket of the array
+	call WriteChar
+	dec ecx										; decrease the loop amount of ecx by one so you can print the last elements without a comma
+
+L3:
+	mov ax, [esi]								; print the next value of the array into ax
+	call WriteInt						
+	mov edx, OFFSET comma						; write the comma and space for the next value
+	call WriteString
+	add esi, ebx								; go to the next element
+	loop L3										; end of the loop
+	
+	mov ax, [esi]								; print the last value of the array into ax
+	call WriteInt
+	mov al, ']'									; print the last bracket and end the print function
+	call WriteChar
+	call CrlF
 	call CrlF
 
 	exit
 main ENDP
-
-;*************************************************************
-printArray PROC USES ecx ebx esi
-;	RECEIVES: ESI = offset of the source array
-;			  EBX = type of the source
-;			  ECX = number of elements in the source
-;*************************************************************
-.data
-	comma BYTE ", ", 0
-
-.code
-	mov al, '['							; print the opening bracket of the array
-	call WriteChar
-	dec ecx								; decrease the loop amount of ecx by one so you can print the last elements without a comma
-
-L1:
-	mov ax, [esi]						; print the next value of the array into ax
-	call WriteInt						
-	mov edx, OFFSET comma				; write the comma and space for the next value
-	call WriteString
-	add esi, ebx						; go to the next element
-	loop L1								; end of the loop
-	
-	mov ax, [esi]						; print the last value of the array into ax
-	call WriteInt
-	mov al, ']'							; print the last bracket and end the print function
-	call WriteChar
-	call CrlF
-	ret
-printArray ENDP
 
 END main
