@@ -9,11 +9,26 @@ TITLE QuestionC.asm
 ;***************************************************************
 INCLUDE Irvine32.inc
 
+COMMENT !
+public static void main(String[] args) {
+
+		int p = 5;
+		int q = -3;
+		int r = 7;
+		int s = -4;
+		int t = 10;
+		
+		System.out.println(4*t + (p - 3*q) - (s + 2*r));
+		// = 44
+		
+	}
+END COMMENT !
+
 .data
 pVar DWORD 0	
 qVar SDWORD 0 ; signed
 rVar DWORD 0
-sVar DWORD 0 ; signed
+sVar SDWORD 0 ; signed
 tVar DWORD 0
 
 pPrompt BYTE "Enter an unsigned value for 'P': ", 0

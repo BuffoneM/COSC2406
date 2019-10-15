@@ -9,10 +9,28 @@ TITLE QuestionA.asm
 ;***************************************************************
 INCLUDE Irvine32.inc
 
+COMMENT !
+		// PSEUDO CODE
+		System.out.println("Enter a number: ");
+		int input = in.nextInt();
+		
+		DWORD source = input;
+		DWORD target = [source];
+		
+		System.out.println(source.binary);
+		System.out.println(source.hex);
+		System.out.println(source.signedInt);
+
+		System.out.println(target.binary);
+		System.out.println(target.hex);
+		System.out.println(target.signedInt);
+END COMMENT !
+
 .data
 prompt BYTE "Enter an integer: ", 0
 sourceText BYTE "Source:", 0
 targetText BYTE "Target:", 0
+
 binText BYTE "Binary: ", 0
 hexText BYTE "Hexadecimal: ", 0
 sinText BYTE "Signed int: ", 0
@@ -39,17 +57,17 @@ main PROC
 	
 	mov edx, OFFSET binText						; binary print
 	call WriteString
-	call WriteBin
+	call WriteBin								; access data from EAX
 	call CrlF
 		
 	mov edx, OFFSET hexText						; hex print
 	call WriteString
-	call WriteHex
+	call WriteHex								; access data from EAX
 	call CrlF
 	
 	mov edx, OFFSET sinText						; signed int print
 	call WriteString
-	call WriteInt
+	call WriteInt								; access data from EAX
 	call CrlF
 	call CrlF
 
@@ -62,17 +80,17 @@ main PROC
 	
 	mov edx, OFFSET binText						; binary print
 	call WriteString
-	call WriteBin
+	call WriteBin								; access data from EAX
 	call CrlF
 		
 	mov edx, OFFSET hexText						; hex print
 	call WriteString
-	call WriteHex
+	call WriteHex								; access data from EAX
 	call CrlF
 	
 	mov edx, OFFSET sinText						; signed int print
 	call WriteString
-	call WriteInt
+	call WriteInt								; access data from EAX
 	call CrlF
 	
 	exit
