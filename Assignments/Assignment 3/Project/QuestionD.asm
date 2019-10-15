@@ -10,6 +10,24 @@ TITLE QuestionD.asm
 ;***************************************************************
 INCLUDE Irvine32.inc
 
+; Java program for the algorithm used
+COMMENT !
+public static void main(String[] args) {
+
+		int[] array = {1,2,3,4,5};
+		System.out.println(Arrays.toString(array));
+		
+		int prevNum = array[0];
+		for(int i = 1; i < array.length; i++) {
+			int prevNum2 = array[i];
+			array[i] = prevNum;
+			prevNum = prevNum2;
+		}
+		array[0] = prevNum;
+		System.out.println(Arrays.toString(array));
+	}
+END COMMENT !
+
 .data
 array DWORD 10 DUP(?)
 

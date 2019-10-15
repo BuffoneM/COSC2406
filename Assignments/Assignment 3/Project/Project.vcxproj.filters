@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="QuestionD.asm">
+    <MASM Include="QuestionB.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
