@@ -24,7 +24,7 @@ comma BYTE ", ", 0						; used for array printing
 .code
 main PROC
 
-;	****** User I/O into the array ******
+;	****** User I/O into the WORD array ******
 	mov edi, OFFSET wArray				; memory location of the array
 	mov ebx, TYPE wArray				; the amount of bytes per index
 	mov ecx, LENGTHOF wArray			; the length of the array
@@ -41,7 +41,7 @@ L1:
 ;	****** Copy each value in wArray into dwArray ******
 	mov edx, OFFSET wArray				; address of word array
 	mov eax, TYPE wArray				; amount of bytes per index for the word array
-	mov edi, OFFSET dwArray
+	mov edi, OFFSET dwArray				
 	mov ebx, TYPE dwArray
 	mov ecx, LENGTHOF dwArray			; both arrays have the same length
 L2:
