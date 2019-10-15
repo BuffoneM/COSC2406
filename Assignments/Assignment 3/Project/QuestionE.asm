@@ -4,7 +4,7 @@ TITLE QuestionE.asm
 ; -October 15th, 2019
 ; -COSC2406A19F Assignment 3, Question E
 
-; -This program compute a fib sequence
+; -This program computes a fib sequence
 ;***************************************************************
 INCLUDE Irvine32.inc
 
