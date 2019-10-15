@@ -82,7 +82,7 @@ L2:
 	mov [edi], edx								; Move the last prevNum (last number in the array) to be the first element in the array
 
 ;   ****** Print the final array ******
-	mov ecx, LENGTHOF array						; Reset ECX back to 4 for the printArray function
+	mov ecx, LENGTHOF array						; ECX = amount of elements in the array
 	call printArray
 	call CrlF
 
