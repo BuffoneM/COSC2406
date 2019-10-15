@@ -63,7 +63,7 @@ L1:
 
 ;	****** Re-index the Array ******
 	mov edi, OFFSET array						; EDI = address of the array
-	mov ecx, LENGTHOF array						; Reset ECX back to 4 for the index change
+	mov ecx, LENGTHOF array						; ECX = amount of elements in the array
 	
 	mov eax, [edi]								; Store array[0] in prevNum
 	mov prevNum, eax
@@ -73,7 +73,7 @@ L2:
 	mov eax, [edi]								; Move array[i] into eax (the upcoming number)
 	mov edx, prevNum
 	mov [edi], edx								; Set the current value in the array to the previous number
-	mov prevNum, eax							; Set the prevNum to be the next number to be moved over
+	mov prevNum, eax							; Set the prevNum to be the next number to be moved over (eax)
 	add edi, ebx								; Go to the next element
 	loop L2
 
