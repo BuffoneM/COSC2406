@@ -15,19 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="QuestionE.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
-    <MASM Include="QuestionD.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
-    <MASM Include="QuestionC.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
     <MASM Include="QuestionB.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
-    <MASM Include="QuestionA.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>

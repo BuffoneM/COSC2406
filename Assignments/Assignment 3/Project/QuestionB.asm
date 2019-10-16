@@ -44,9 +44,10 @@ L1:
 	mov edi, OFFSET dwArray				
 	mov ebx, TYPE dwArray
 	mov ecx, LENGTHOF dwArray			; both arrays have the same length
+
 L2:
 	mov esi, [edx]
-	mov [edi], DWORD PTR esi			; add the BYTE at the current index into the DWORD array
+	mov [edi], DWORD PTR esi			; add the WORD at the current index into the DWORD array
 	add edi, ebx						; go to the next element of the dWORD array
 	add edx, eax						; go to the next element of the WORD array
 	loop L2
