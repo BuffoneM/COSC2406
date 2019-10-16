@@ -14,4 +14,21 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <MASM Include="QuestionE.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="QuestionD.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="QuestionC.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="QuestionB.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="QuestionA.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+  </ItemGroup>
 </Project>
