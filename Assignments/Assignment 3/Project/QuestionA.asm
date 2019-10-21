@@ -30,18 +30,21 @@ main PROC
 	call ReadInt
 	mov source, eax
 	mov ebx, 0									; move 0 to ebx for the counter
-	mov edx, OFFSET target
+	mov edi, OFFSET source						; edi = address of source array
+	mov esi, OFFSET target						; esi = address of target array
+	mov ecx, TYPE DWORD
 
+;	******put source into target byte by byte******
 L1:
-	mov al, BYTE PTR [eax + ebx]				; move the current byte of eax + ebx into al
-	mov [edx+ebx], al							; move al into target
-	inc ebx
+	mov al, BYTE PTR [edi]						; move the current byte of source into al
+	mov [esi], al								; move al into target array
+	add edi, TYPE BYTE							; add type byte to go to next index
+	add esi, TYPE BYTE			
 	loop L1
-	mov target, edx								; move the built dword back into target
 
 	call CrlF
 
-	; *****Print Source*****
+;	*****Print Source*****
 	mov edx, OFFSET sourceText					
 	call WriteString
 	call CrlF
@@ -64,7 +67,7 @@ L1:
 	call CrlF
 
 
-	; *****Print target*****
+;	*****Print target*****
 	mov edx, OFFSET targetText					
 	call WriteString
 	call CrlF
