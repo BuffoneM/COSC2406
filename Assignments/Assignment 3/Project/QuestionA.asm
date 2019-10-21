@@ -29,8 +29,16 @@ main PROC
 	call WriteString
 	call ReadInt
 	mov source, eax
-	mov ebx, source
-	mov target, ebx
+	mov ebx, 0									; move 0 to ebx for the counter
+	mov edx, OFFSET target
+
+L1:
+	mov al, BYTE PTR [eax + ebx]				; move the current byte of eax + ebx into al
+	mov [edx+ebx], al							; move al into target
+	inc ebx
+	loop L1
+	mov target, edx								; move the built dword back into target
+
 	call CrlF
 
 	; *****Print Source*****
