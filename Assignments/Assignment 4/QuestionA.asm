@@ -28,33 +28,51 @@ index BYTE 27 DUP(?)
 main PROC
 
 ;	****** User I/O ******
-	mov edx, OFFSET prompt							; Print msg and collect the file string
+	mov edx, OFFSET prompt								; Print msg and collect the file string
 	call WriteString
-	mov ecx, LENGTHOF fileName						; String input from the user
+	mov ecx, LENGTHOF fileName							; String input from the user
 	mov edx, OFFSET fileName
-	call ReadString
+	call ReadString										; Returns the string into edx
 
 
 ;	****** Open the file ******
-	call OpenInputFile
-	mov fileHandle, eax								; Save the file handle
+	call OpenInputFile									; Call procedure with the fileName in edx
+	mov fileHandle, eax									; OpenInputFile returns fileHandle in eax, save it
 
 ;	****** Read from the file and store into letters array ******
-	mov edx, OFFSET letters							; Move the location of the letters array to edx
-	mov ecx, LENGTHOF letters						; Move ecx (loop) for the length of letters array
-	call ReadFromFile
+	mov edx, OFFSET letters								; Move the location of the letters array to edx
+	mov ecx, LENGTHOF letters							; Move ecx (loop) for the length of letters array
+	call ReadFromFile									; Store content of file into letters
 
 ;	****** Read from the file and store into index array ******
-	mov eax, fileHandle								; Move the file handle to eax
-	mov edx, OFFSET index							; Move the location of the letters array to edx
-	mov ecx, LENGTHOF index							; Move ecx (loop) for the length of index array
-	call ReadFromFile
+	mov eax, fileHandle									; Move the file handle to eax
+	mov edx, OFFSET index								; Move the location of the letters array to edx
+	mov ecx, LENGTHOF index								; Move ecx (loop) for the length of index array
+	call ReadFromFile									; Store content of file into index
 
 ;	****** Close the file ******
 	mov eax, fileHandle
 	call CloseFile
 
-;	*** Print the array ***
+;	****** Print the letter array using the indexes ******
+	mov ecx, LENGTHOF letters
+	dec ecx												; Decrement to prevent comma being prented
+
+	movzx esi, BYTE PTR index[LENGTHOF index-1]			; Go to the last value in the index array
+L1:
+	mov al, letters[esi]								; Move the letter[index] into al and print it
+	call WriteChar										
+	mov edx, OFFSET comma								; Print the comma and space
+	call WriteString
+	movzx esi, BYTE PTR index[esi]						; Move the position of the letter that needs to be printed next into esi
+	loop L1;
+
+	mov al, letters[esi]								; Move the last value letters[esi] (the end of the array) into al and print it
+	call WriteChar
+	call CrlF
+	call CrlF
+
+;	*** Print the arrays ***
 	mov esi, OFFSET letters
 	mov ebx, TYPE letters
 	mov ecx, LENGTHOF letters
@@ -65,8 +83,6 @@ main PROC
 	mov ecx, LENGTHOF index
 	call PrintArrayInt 
 	
-
-;	******
 	exit
 main ENDP
 
