@@ -87,13 +87,17 @@ L1:
 main ENDP
 
 ;*************************************************************
-printArrayChar PROC USES ecx ebx esi
+printArrayChar PROC
 ;	RECEIVES: ESI = offset of the source array
 ;			  EBX = type of the source
 ;			  ECX = number of elements in the source
 ;*************************************************************
 
 .code
+	PUSH ECX
+	PUSH EBX
+	PUSH ESI
+
 	mov al, '['							; print the opening bracket of the array
 	call WriteChar
 	dec ecx								; decrease the loop amount of ecx by one so you can print the last elements without a comma
@@ -112,17 +116,24 @@ L1:
 	call WriteChar
 	call CrlF
 
+	POP ESI
+	POP EBX
+	POP ECX
 	ret
 printArrayChar ENDP
 
 ;*************************************************************
-printArrayInt PROC USES ecx ebx esi
+printArrayInt PROC
 ;	RECEIVES: ESI = offset of the source array
 ;			  EBX = type of the source
 ;			  ECX = number of elements in the source
 ;*************************************************************
 
 .code
+	PUSH ECX
+	PUSH EBX
+	PUSH ESI
+
 	mov al, '['							; print the opening bracket of the array
 	call WriteChar
 	dec ecx								; decrease the loop amount of ecx by one so you can print the last elements without a comma
@@ -141,6 +152,9 @@ L2:
 	call WriteChar
 	call CrlF
 
+	POP ESI
+	POP EBX
+	POP ECX
 	ret
 printArrayInt ENDP
 END main
