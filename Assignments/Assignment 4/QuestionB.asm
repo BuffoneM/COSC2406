@@ -58,7 +58,8 @@ BetterRandomRange PROC
 	inc eax												; Increment eax to ensure inclusive range
 	call RandomRange									; Returns a random number in the range in eax
 	add eax, ebx										; Add the low range back to eax
-	ret
 
+	ret
 BetterRandomRange ENDP
+
 END main
