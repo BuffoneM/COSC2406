@@ -24,6 +24,9 @@
   <ItemGroup>
     <Text Include="test1.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="test2.dat" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{C0BF21A3-DF7A-4F4C-B3F2-0E7ED7C4F5FB}</ProjectGuid>
