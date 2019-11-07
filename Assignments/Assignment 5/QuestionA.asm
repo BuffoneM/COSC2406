@@ -13,7 +13,8 @@ INCLUDE Irvine32.inc
 
 ; Prompts
 prompt BYTE "Enter the file name: ", 0
-comma BYTE " ,", 0
+invalidFile BYTE ": cannot locate file...", 0
+
 
 ; File data
 fileName BYTE 30 DUP(?)
@@ -21,7 +22,7 @@ fileHandle HANDLE ?
 fileBuffer BYTE 100 DUP(?)
 
 ; Data
-fileData BYTE 36 DUP(0)
+counter BYTE 36 DUP(0)
 numBytes DWORD 0
 
 ;----------Main Code Section------------------------------------
@@ -29,15 +30,54 @@ numBytes DWORD 0
 main PROC
 
 ;	****** User I/O ******
+validateFile:
 	mov edx, OFFSET prompt								; Print msg and collect the file string
 	call WriteString
 	mov ecx, LENGTHOF fileName							; String input from the user
 	mov edx, OFFSET fileName
 	call ReadString										; Returns the string into edx
+	call CrlF
+	call WriteString
 
 ;	****** Open the file ******
 	call OpenInputFile									; Call procedure with the fileName in edx
+	cmp eax, INVALID_HANDLE_VALUE
+	je printLine										; If the file doesn't exist, print an invalid file prompt and ask for another file
+	jmp continue										; If the file exists, continue by making the file handle
+
+printLine:
+	mov edx, OFFSET invalidFile
+	call WriteString
+	call CrlF
+	jmp validateFile
+
+continue:
 	mov fileHandle, eax									; OpenInputFile returns fileHandle in eax, save it
+	
+	mov eax, fileHandle
+	mov edx, OFFSET fileBuffer
+	mov ecx, SIZEOF fileBuffer
+	call processCharacters
+
+;	*** Print the results ***
+	mov esi, OFFSET counter
+	mov edi, TYPE counter
+	call printCountResult
+
+	exit
+main ENDP
+
+
+;*************************************************************
+processCharacters PROC USES eax edx ecx
+;-  Processes all of the characters within the file, stores
+;-  them in a buffer, and counts each character
+;	RECEIVES: EAX = File handle
+;			  ECX = Size of file buffer
+;			  EDX = Offset of file buffer
+;	 RETURNS: Nothing
+;*************************************************************
+.code
 
 ;	****** Read from the file ******
 readLoop:
@@ -56,97 +96,119 @@ readLoop:
 ;	*** Count every element in the file buffer ***
 indexElements:						
 	mov al, [esi]										; Print every element in the file
-	call WriteChar
 	add esi, TYPE fileBuffer							; Go to the next element in esi
 
 	call isChar											; if(al == char)
 	jz itsAChar
 	call isDigit										; if(al == digit)
 	jz itsADig
-	jmp exitCheck
+	jmp continue										; if it isn't an applicable char or digit, continue
 
 itsAChar:
+;	*** Convert the letter to upper case ***
+	and al, 223
+	sub al, 55
+	movzx edi, al
+	inc counter[edi]
 
 itsADig:
-	sub al, '0'											; Subtract 48 from AL to get the proper index
+	sub al, '0'											; Subtract '0' from AL to get the proper index
 	movzx edi, al
-	inc fileData[edi]									; Add one to the proper index
+	inc counter[edi]									; Add one to the proper index
 
-	loop indexElements
-	jmp readLoop
+continue:												
+	loop indexElements									; Jump back up to read the next element
+	jmp readLoop										; Take in another set of elements
 
 doneReading:
 	mov eax, fileHandle
 	call CloseFile
-
-exitCheck:
-
 	call CrlF
-	mov esi, OFFSET fileData
-	mov ebx, TYPE fileData
-	mov ecx, LENGTHOF fileData
-	call printArrayInt
-
-	call CrlF
-	exit
-main ENDP
+	
+	ret
+processCharacters ENDP
 
 
 ;*************************************************************
 isChar PROC USES eax
-;	RECEIVES: AL which is a letter
+;-	Tests if AL is a character
+;	RECEIVES: AL = which is a letter
 ;	 RETURNS: ZF = 1 if the value in the AL register is a 
 ;			  letter, either upper case or lower case
 ;*************************************************************
 .code
-	cmp al, 97							; if(al < 97) check to see if it's a capital letter
+	cmp al, 97											; if(al < 97) check to see if it's a capital letter
 	jb checkCapital						
-	cmp al, 122							; if(al > 122) it isn't a lower case letter
+	cmp al, 122											; if(al > 122) it isn't a lower case letter
 	ja notChar
-	test ax, 0							; set zf = 1
+	test ax, 0											; set zf = 1
 
 checkCapital:			
-	cmp al, 65							; if(al < 65) it isn't a capital letter so it can't be a char
+	cmp al, 65											; if(al < 65) it isn't a capital letter so it can't be a char
 	jb notChar
-	test ax, 0							; set zf = 1
+	test ax, 0											; set zf = 1
 notChar:
 	ret
 isChar ENDP
 
 
 ;*************************************************************
-printArrayInt PROC
+printCountResult PROC
+;-	Prints out a summary of all characters and their amount
 ;	RECEIVES: ESI = offset of the source array
-;			  EBX = type of the source
-;			  ECX = number of elements in the source
+;			  EDI = type of the source array
+;	 RETURNS: Nothing
 ;*************************************************************
+.data
+countOf BYTE "count of '", 0
+equals BYTE "' = ", 0
 .code
-	PUSH ECX
-	PUSH EBX
 	PUSH ESI
+	PUSH EDI
 
-	mov al, '['							; print the opening bracket of the array
-	call WriteChar
-	dec ecx								; decrease the loop amount of ecx by one so you can print the last elements without a comma
-	mov eax, 0
-L1:
-	mov al, [esi]						; print the next value of the array into ax
-	call WriteDec						
-	mov edx, OFFSET comma				; write the comma and space for the next value
+;	*** Print numbers 0 - 9 ***
+	mov ecx, 10
+	mov ebx, 0
+printNum:
+	mov eax, ebx										; Print "count of 'num' = "
+	mov edx, OFFSET countOf
 	call WriteString
-	add esi, ebx						; go to the next element
-	loop L1								; end of the loop
-	
-	mov al, [esi]						; print the last value of the array into ax
 	call WriteDec
-	mov al, ']'							; print the last bracket and end the print function
-	call WriteChar
-	call CrlF
+	mov edx, OFFSET equals
+	call WriteString					
 
+;	*** Print the numbers in the count array ***
+	mov al, [esi]										; Print the corresponding number
+	call WriteDec
+	add esi, edi 
+
+	call CrlF
+	inc ebx
+	loop printNum
+
+;	*** Print letters a - z ***
+	mov ecx, 26
+	mov ebx, 97
+printLetters:
+	mov eax, ebx 										; Print "letter = "
+	mov edx, OFFSET countOf
+	call WriteString
+	call WriteChar
+	mov edx, OFFSET equals
+	call WriteString					
+
+;	*** Print the numbers in the count array ***
+	mov al, [esi]										; Print the corresponding number
+	call WriteDec
+	add esi, edi 
+
+	call CrlF
+	inc ebx
+	loop printLetters
+
+	POP EDI
 	POP ESI
-	POP EBX
-	POP ECX
 	ret
-printArrayInt ENDP
+printCountResult ENDP
 
 END main
