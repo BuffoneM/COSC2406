@@ -77,6 +77,7 @@ processCharacters PROC
 
 ;	****** Read from the file ******
 readLoop:
+
 	mov eax, fileHandle
 	mov edx, OFFSET fileBuffer
 	mov ecx, SIZEOF fileBuffer
@@ -103,16 +104,17 @@ indexElements:
 itsAChar:
 ;	*** Convert the letter to upper case ***
 	and al, 223
-	sub al, 55
+	sub al, 55											; Get the correct index for the count array
 	movzx edi, al
-	inc counter[edi]
+	inc counter[edi]									; Increment the position
 
 itsADig:
 	sub al, '0'											; Subtract '0' from AL to get the proper index
 	movzx edi, al
 	inc counter[edi]									; Add one to the proper index
 
-continue:												
+continue:
+
 	loop indexElements									; Jump back up to read the next element
 	jmp readLoop										; Take in another set of elements
 
@@ -126,13 +128,14 @@ processCharacters ENDP
 
 
 ;*************************************************************
-isChar PROC USES eax
+isChar PROC
 ;-	Tests if AL is a character
 ;	RECEIVES: AL = which is a letter
 ;	 RETURNS: ZF = 1 if the value in the AL register is a 
 ;			  letter, either upper case or lower case
 ;*************************************************************
 .code
+	PUSH EAX
 	cmp al, 97											; if(al < 97) check to see if it's a capital letter
 	jb checkCapital						
 	cmp al, 122											; if(al > 122) it isn't a lower case letter
@@ -144,12 +147,13 @@ checkCapital:
 	jb notChar
 	test ax, 0											; set zf = 1
 notChar:
+	POP EAX
 	ret
 isChar ENDP
 
 
 ;*************************************************************
-printCountResult PROC
+printCountResult PROC USES ESI EDI
 ;-	Prints out a summary of all characters and their amount
 ;	RECEIVES: ESI = offset of the source array
 ;			  EDI = type of the source array
@@ -159,8 +163,6 @@ printCountResult PROC
 countOf BYTE "count of '", 0
 equals BYTE "' = ", 0
 .code
-	PUSH ESI
-	PUSH EDI
 
 ;	*** Print numbers 0 - 9 ***
 	mov ecx, 10
@@ -202,8 +204,6 @@ printLetters:
 	inc ebx
 	loop printLetters
 
-	POP EDI
-	POP ESI
 	ret
 printCountResult ENDP
 
