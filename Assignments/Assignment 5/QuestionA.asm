@@ -106,12 +106,12 @@ itsAChar:
 	and al, 223
 	sub al, 55											; Get the correct index for the count array
 	movzx edi, al
-	inc counter[edi*2]									; Increment the position
+	inc counter[edi * TYPE counter]						; Increment the position
 
 itsADig:
 	sub al, '0'											; Subtract '0' from AL to get the proper index
 	movzx edi, al
-	inc counter[edi*2]									; Add one to the proper index
+	inc counter[edi * TYPE counter]						; Add one to the proper index
 
 continue:
 
