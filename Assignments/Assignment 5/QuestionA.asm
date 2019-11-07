@@ -4,8 +4,8 @@ TITLE QuestionA.asm
 ; -November 4th, 2019
 ; -COSC2406A19F Assignment 5, Question A
 
-; -This program will read an integer, store it into a DWORD, 
-;  and compute operations based on that input
+; -This program will create a file buffer and count the amount
+;  of characters / numbers in that file
 ;***************************************************************
 INCLUDE Irvine32.inc
 
@@ -14,7 +14,6 @@ INCLUDE Irvine32.inc
 ; Prompts
 prompt BYTE "Enter the file name: ", 0
 invalidFile BYTE ": cannot locate file...", 0
-
 
 ; File data
 fileName BYTE 30 DUP(?)
@@ -54,9 +53,6 @@ printLine:
 continue:
 	mov fileHandle, eax									; OpenInputFile returns fileHandle in eax, save it
 	
-	mov eax, fileHandle
-	mov edx, OFFSET fileBuffer
-	mov ecx, SIZEOF fileBuffer
 	call processCharacters
 
 ;	*** Print the results ***
@@ -69,7 +65,7 @@ main ENDP
 
 
 ;*************************************************************
-processCharacters PROC USES eax edx ecx
+processCharacters PROC
 ;-  Processes all of the characters within the file, stores
 ;-  them in a buffer, and counts each character
 ;	RECEIVES: EAX = File handle
