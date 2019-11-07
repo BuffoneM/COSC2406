@@ -195,7 +195,7 @@ printLetters:
 	mov edx, OFFSET equals
 	call WriteString					
 
-;	*** Print the numbers in the count array ***
+;	*** Print the letters in the count array ***
 	mov al, [esi]										; Print the corresponding number
 	call WriteDec
 	add esi, edi 
