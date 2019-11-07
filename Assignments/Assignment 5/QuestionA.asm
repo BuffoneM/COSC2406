@@ -21,7 +21,7 @@ fileHandle HANDLE ?
 fileBuffer BYTE 100 DUP(?)
 
 ; Data
-counter BYTE 36 DUP(0)
+counter WORD 36 DUP(0)
 numBytes DWORD 0
 
 ;----------Main Code Section------------------------------------
@@ -106,12 +106,12 @@ itsAChar:
 	and al, 223
 	sub al, 55											; Get the correct index for the count array
 	movzx edi, al
-	inc counter[edi]									; Increment the position
+	inc counter[edi*2]									; Increment the position
 
 itsADig:
 	sub al, '0'											; Subtract '0' from AL to get the proper index
 	movzx edi, al
-	inc counter[edi]									; Add one to the proper index
+	inc counter[edi*2]									; Add one to the proper index
 
 continue:
 

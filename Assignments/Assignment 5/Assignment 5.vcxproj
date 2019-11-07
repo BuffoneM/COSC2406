@@ -19,13 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="QuestionA.asm" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="test1.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="test2.dat" />
+    <MASM Include="QuestionB.asm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
