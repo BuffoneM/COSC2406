@@ -68,9 +68,6 @@ main ENDP
 processCharacters PROC
 ;-  Processes all of the characters within the file, stores
 ;-  them in a buffer, and counts each character
-;	RECEIVES: EAX = File handle
-;			  ECX = Size of file buffer
-;			  EDX = Offset of file buffer
 ;	 RETURNS: Nothing
 ;*************************************************************
 .code
