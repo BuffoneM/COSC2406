@@ -11,10 +11,20 @@ INCLUDE Irvine32.inc
 
 .data
 
+menu BYTE "1 - Populate the array with random numbers", 0ah,
+		  "2 - Multiply the array with a user provided multiplier", 0ah,
+		  "3 - Divide the array with a user provided divisor", 0ah,
+		  "4 - Print the array", 0ah,
+		  "0 - Exit", 0
+
 ;----------Main Code Section------------------------------------
 .code
 main PROC
-	;mov edx, OFFSET pPrompt						; Print msg and collect pVar
+	mov edx, OFFSET menu					; Print menu
+	call WriteString
+	call CrlF
+
+	exit
 main ENDP
 
 ;***************************************************************
