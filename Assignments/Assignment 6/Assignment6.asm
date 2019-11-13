@@ -19,6 +19,10 @@ invalidOption BYTE "Invalid option entered...", 0
 procedureComplete BYTE "Successfully executed...", 0ah,
 						"-------------------------------------------", 0
 
+multiplyPrompt BYTE "Enter a number to multiply: ", 0
+dividePrompt BYTE "Enter a number to divide: ", 0
+
+
 menu BYTE "1 - Populate the array with random numbers", 0ah,
 		  "2 - Multiply the array with a user provided multiplier", 0ah,
 		  "3 - Divide the array with a user provided divisor", 0ah,
@@ -60,6 +64,7 @@ option1:
 	push OFFSET array						; Push offset of the SWORD array
 	push LENGTHOF array						; Push the amount of elements in the SWORD array
 	call populateRandomArray
+	call CrlF
 
 	mov edx, OFFSET procedureComplete		; Print message and go to menu
 	call WriteString
@@ -68,6 +73,13 @@ option1:
 
 ;	*** Multiply the array ***
 option2:
+	mov edx, OFFSET multiplyPrompt			; Print prompt and collect user num
+	call WriteString
+	call ReadInt
+	
+	push OFFSET array						; Push offset of the SWORD array
+	push eax								; Push the multiplier
+	call multiplyArray
 
 	mov edx, OFFSET procedureComplete		; Print message and go to menu
 	call WriteString
@@ -76,6 +88,7 @@ option2:
 
 ;	*** Divide the array ***
 option3:
+	
 
 	mov edx, OFFSET procedureComplete		; Print message and go to menu
 	call WriteString
@@ -107,11 +120,11 @@ populateRandomArray PROC
 ;	RECEIVES: Stack Var1: Offset of the SWORD array
 ;			  Stack Var2: Number of elements in the array
 ;	 RETURNS: Nothing
-;	 [EBP + 8] = length of the array
+;	 [EBP + 8]  = length of the array
 ;    [EBP + 12] = offset of the array
 ;***************************************************************
 .code
-	ENTER 4, 0								; Create the proc. anchor
+	ENTER 2, 0								; Create the proc. anchor
 	mov esi, [EBP + 12]						; ESI contains the offset of the array
 
 ;	*** Generate the random number and store it in the array ***
@@ -123,8 +136,6 @@ praLoop1:
 	inc eax
 	call RandomRange
 	add eax, ebx							; EAX now has the random number
-	call WriteInt
-	call CrlF
 
 	mov [esi], eax							; Put eax into the array
 	add esi, TYPE WORD						; Go to the next element
@@ -133,6 +144,23 @@ praLoop1:
 	LEAVE									; Remove the proc. anchor
 	ret
 populateRandomArray ENDP
+
+
+;***************************************************************
+multiplyArray PROC
+;	RECEIVES: Stack Var1: Offset of the SWORD array
+;			  Stack Var2: Multiplier
+;	 RETURNS: Nothing
+;***************************************************************
+.code
+	push ebp								; Create the proc. anchor
+	mov ebp, esp
+	
+
+	pop ebp									; Remove the proc. anchor
+	ret
+
+multiplyArray ENDP
 
 
 ;*************************************************************
