@@ -94,6 +94,7 @@ option3:
 	call WriteString
 	call ReadInt
 
+	mov esi, OFFSET array
 	mov ebx, [esi]							; Move the value into ebx
 	push ebx								; Push current array element
 	push eax								; Push the divisor
@@ -166,39 +167,33 @@ populateRandomArray ENDP
 
 
 ;***************************************************************
-multiplyArray PROC;,
-;	multiplyAmnt :  SDWORD,
-;	arrayLength	 :  SDWORD,
-;	arrayOffset  :  PTR SDWORD
+multiplyArray PROC,
+	multiplyAmnt :  SDWORD,
+	arrayLength	 :  SDWORD,
+	arrayOffset  :  PTR SDWORD
 ;	RECEIVES: Stack Var1: Offset of the SWORD array
 ;			  Stack Var2: Number of elements in the array
 ;			  Stack Var3: Multiplier
 ;	 RETURNS: Nothing
-;    [EBP + 8]  = Multiplier amount
-;	 [EBP + 12] = length of the array
-;    [EBP + 16] = offset of the array
 ;***************************************************************
 .code
-	push ebp								; Create the proc. anchor
-	mov ebp, esp
 	
-	mov esi, [EBP + 16] 					; ESI contains the offset of the array
-;	mov esi, arrayOffset					; ESI contains the offset of the array
+;	mov esi, [EBP + 16] 					; ESI contains the offset of the array
+	mov esi, arrayOffset					; ESI contains the offset of the array
 
 ;	*** Multiply every element by the multiplier and store it ***
-	mov ecx, [EBP + 12]						; Loop for the length of the array
-;	mov ecx, arrayLength					; Loop for the length of the array
+;	mov ecx, [EBP + 12]						; Loop for the length of the array
+	mov ecx, arrayLength					; Loop for the length of the array
 maLoop1:
-	mov ax, [EBP + 8]						; ax contains the multiplier
-;	mov ax, SWORD PTR multiplyAmnt			; ax contains the multiplier
+;	mov ax, [EBP + 8]						; ax contains the multiplier
+	mov ax, SWORD PTR multiplyAmnt			; ax contains the multiplier
 	imul SWORD PTR[esi]						; Multiply the current element by the user multiplier
 	
 	mov [esi], ax							; Put ax into the WORD array
 	add esi, TYPE WORD						; Go to the next element
 	loop maLoop1
 
-	pop ebp									; Remove the proc. anchor
-	ret
+	ret 12
 
 multiplyArray ENDP
 
@@ -217,10 +212,12 @@ divideArray PROC
 	
 ;	*** Divide the element ***
 	mov edx, 0								; Clear edx
-	mov eax, [EBP + 12]						; Number to be divided
-	mov ebx, [EBP + 8]						; Divisor
-	div ebx									; EAX now has the result
-
+	mov eax, [EBP + 12]						; Divisor
+	call WriteInt
+	call CrlF
+	cdq
+	mov ebx, [EBP + 8]						; Current array element
+	idiv ebx								; EAX now has the result
 	pop ebp									; Remove the proc. anchor
 	ret
 
