@@ -29,6 +29,14 @@ menu BYTE "1 - Populate the array with random numbers", 0ah,
 		  "4 - Print the array", 0ah,
 		  "0 - Exit", 0
 
+;	*** Function Prototype(s) ***
+;*************************************************************
+printArrayInt PROTO, 
+	arrayLength		: DWORD,
+	arrayType		: DWORD,
+	arrayOffset		: PTR DWORD
+;*************************************************************
+
 ;----------Main Code Section------------------------------------
 .code
 main PROC
@@ -94,21 +102,19 @@ option3:
 	call WriteString
 	call ReadInt
 
-	mov esi, OFFSET array
-	mov eax, [esi]							; Move the value into ebx
-	call WriteInt
-	call CrlF
+	mov esi, OFFSET array					; ESI = array address
+	mov ecx, LENGTHOF array					; Loop for the length of the array
+opt3Loop1:
+	movsx ebx, WORD PTR [esi]				; Move the value into ebx
+	push ebx								; Push current array element
+	push eax								; Push the divisor
+	call divideArray						; Returns the divided number
 
-	;push ebx								; Push current array element
-	;push eax								; Push the divisor
-	;call divideArray
-	;call WriteInt
-	;call CrlF
-	;mov [esi], eax							; Move the divided number back into the array
-	;add esi, TYPE array
-
-;	pop eax
-;	pop ebx
+	mov [esi], ax							; Store the divided number in the array
+	add esi, TYPE array						; Go to the next element
+	pop eax
+	pop ebx
+	loop opt3Loop1
 	call CrlF
 
 	mov edx, OFFSET procedureComplete		; Print message and go to menu
@@ -117,12 +123,8 @@ option3:
 	jmp promptUser
 
 ;	*** Print the array ***
-option4:
-	
-	mov esi, OFFSET array					
-	mov ebx, TYPE array
-	mov ecx, LENGTHOF array
-	call PrintArrayInt
+option4:			
+	invoke PrintArrayInt, LENGTHOF array, TYPE array, OFFSET array
 	call CrlF
 
 	mov edx, OFFSET procedureComplete		; Print message and go to menu
@@ -146,6 +148,9 @@ populateRandomArray PROC
 ;***************************************************************
 .code
 	ENTER 8, 0								; Create the proc. anchor
+	PUSHAD
+	PUSHFD
+
 	mov esi, [EBP + 12]						; ESI contains the offset of the array
 	mov DWORD PTR[EBP-4], 2500				; Create local variables
 	mov DWORD PTR[EBP-8], -1500
@@ -164,7 +169,10 @@ praLoop1:
 	add esi, TYPE WORD						; Go to the next element
 	loop praLoop1
 
+	POPFD
+	POPAD
 	LEAVE									; Remove the proc. anchor
+	
 	ret
 populateRandomArray ENDP
 
@@ -174,21 +182,17 @@ multiplyArray PROC,
 	multiplyAmnt :  SDWORD,
 	arrayLength	 :  SDWORD,
 	arrayOffset  :  PTR SDWORD
-;	RECEIVES: Stack Var1: Offset of the SWORD array
-;			  Stack Var2: Number of elements in the array
-;			  Stack Var3: Multiplier
 ;	 RETURNS: Nothing
 ;***************************************************************
 .code
-	
-;	mov esi, [EBP + 16] 					; ESI contains the offset of the array
+	PUSHAD
+	PUSHFD
+
 	mov esi, arrayOffset					; ESI contains the offset of the array
 
 ;	*** Multiply every element by the multiplier and store it ***
-;	mov ecx, [EBP + 12]						; Loop for the length of the array
 	mov ecx, arrayLength					; Loop for the length of the array
 maLoop1:
-;	mov ax, [EBP + 8]						; ax contains the multiplier
 	mov ax, SWORD PTR multiplyAmnt			; ax contains the multiplier
 	imul SWORD PTR[esi]						; Multiply the current element by the user multiplier
 	
@@ -196,8 +200,9 @@ maLoop1:
 	add esi, TYPE WORD						; Go to the next element
 	loop maLoop1
 
+	POPFD
+	POPAD
 	ret
-
 multiplyArray ENDP
 
 
@@ -212,48 +217,58 @@ divideArray PROC
 .code
 	push ebp								; Create the proc. anchor
 	mov ebp, esp
+	PUSHFD
 	
 ;	*** Divide the element ***
 	mov edx, 0								; Clear edx
 	mov eax, [EBP + 12]						; Divisor
-	call WriteInt
-	call CrlF
 	cdq
 	mov ebx, [EBP + 8]						; Current array element
 	idiv ebx								; EAX now has the result
-	pop ebp									; Remove the proc. anchor
-	ret
 
+	POPFD
+	pop ebp									; Remove the proc. anchor
+	ret										; EAX = answer
 divideArray ENDP
 
+
 ;*************************************************************
-printArrayInt PROC USES ecx ebx esi
-;	RECEIVES: ESI = offset of the source array
-;			  EBX = type of the source
-;			  ECX = number of elements in the source
+printArrayInt PROC, 
+	arrayLength		: DWORD,
+	arrayType		: DWORD,
+	arrayOffset		: PTR DWORD
 ;*************************************************************
 .data
 	comma BYTE ", ", 0
 .code
+	PUSHAD
+	PUSHFD
+
+	mov ecx, arrayLength				; Move the named parameters into the registers
+	mov ebx, arrayType
+	mov esi, arrayOffset
 
 	mov al, '['							; print the opening bracket of the array
 	call WriteChar
-	dec ecx								; decrease the loop amount of ecx by one so you can print the last elements without a comma
+	dec ecx								; dec ecx so you can print the last element without a comma
 
 L2:
-	movsx eax, SWORD PTR [esi]			; print the next value of the array into ax
+	movsx eax, SWORD PTR [esi]			; print the next value of the array
 	call WriteInt						
 	mov edx, OFFSET comma				; write the comma and space for the next value
 	call WriteString
 	add esi, ebx						; go to the next element
 	loop L2								; end of the loop
 	
-	movsx eax, SWORD PTR [esi]			; print the last value of the array into ax
+	movsx eax, SWORD PTR [esi]			; print the last value of the array
 	call WriteInt
 	mov al, ']'							; print the last bracket and end the print function
 	call WriteChar
 	call CrlF
 
+	POPFD
+	POPAD
 	ret
 printArrayInt ENDP
+
 END main
