@@ -93,11 +93,18 @@ option3:
 	mov edx, OFFSET dividePrompt			; Print prompt and collect user num
 	call WriteString
 	call ReadInt
-	
-	push OFFSET array						; Push offset of the SWORD array
-	push LENGTHOF array						; Push the amount of elements in the SWORD array
+
+	mov ebx, [esi]							; Move the value into ebx
+	push ebx								; Push current array element
 	push eax								; Push the divisor
 	call divideArray
+	call WriteInt
+	call CrlF
+	;mov [esi], eax							; Move the divided number back into the array
+	;add esi, TYPE array
+
+;	pop eax
+;	pop ebx
 	call CrlF
 
 	mov edx, OFFSET procedureComplete		; Print message and go to menu
@@ -159,7 +166,6 @@ populateRandomArray ENDP
 
 
 ;***************************************************************
-; CONDITIONS: The number cannot create a result > size of WORD
 multiplyArray PROC;,
 ;	multiplyAmnt :  SDWORD,
 ;	arrayLength	 :  SDWORD,
@@ -198,42 +204,27 @@ multiplyArray ENDP
 
 
 ;***************************************************************
-; CONDITIONS: The number cannot create a result > size of WORD
-divideArray PROC;,
-;	divideAmnt :  SDWORD,
-;	arrayLength	 :  SDWORD,
-;	arrayOffset  :  PTR SDWORD
-;	RECEIVES: Stack Var1: Offset of the SWORD array
-;			  Stack Var2: Number of elements in the array
-;			  Stack Var3: Multiplier
-;	 RETURNS: Nothing
-;    [EBP + 8]  = Multiplier amount
-;	 [EBP + 12] = length of the array
-;    [EBP + 16] = offset of the array
+divideArray PROC
+;	RECEIVES: Stack Var1: Divisor
+;			  Stack Var2: Current array element
+;	 RETURNS: Answer in EAX
+;    [EBP + 8]  = Divisor
+;	 [EBP + 12] = Current array element
 ;***************************************************************
 .code
 	push ebp								; Create the proc. anchor
 	mov ebp, esp
 	
-	mov esi, [EBP + 16] 					; ESI contains the offset of the array
-;	mov esi, arrayOffset					; ESI contains the offset of the array
-
-;	*** Multiply every element by the multiplier and store it ***
-	mov ecx, [EBP + 12]						; Loop for the length of the array
-;	mov ecx, arrayLength					; Loop for the length of the array
-maLoop1:
-	mov ax, [EBP + 8]						; ax contains the multiplier
-;	mov ax, SWORD PTR multiplyAmnt			; ax contains the multiplier
-	imul SWORD PTR[esi]						; Multiply the current element by the user multiplier
-	
-	mov [esi], ax							; Put ax into the WORD array
-	add esi, TYPE WORD						; Go to the next element
-	loop maLoop1
+;	*** Divide the element ***
+	mov edx, 0								; Clear edx
+	mov eax, [EBP + 12]						; Number to be divided
+	mov ebx, [EBP + 8]						; Divisor
+	div ebx									; EAX now has the result
 
 	pop ebp									; Remove the proc. anchor
 	ret
 
-multiplyArray ENDP
+divideArray ENDP
 
 ;*************************************************************
 printArrayInt PROC USES ecx ebx esi
