@@ -78,8 +78,10 @@ option2:
 	call ReadInt
 	
 	push OFFSET array						; Push offset of the SWORD array
+	push LENGTHOF array						; Push the amount of elements in the SWORD array
 	push eax								; Push the multiplier
 	call multiplyArray
+	call CrlF
 
 	mov edx, OFFSET procedureComplete		; Print message and go to menu
 	call WriteString
@@ -88,7 +90,15 @@ option2:
 
 ;	*** Divide the array ***
 option3:
+	mov edx, OFFSET dividePrompt			; Print prompt and collect user num
+	call WriteString
+	call ReadInt
 	
+	push OFFSET array						; Push offset of the SWORD array
+	push LENGTHOF array						; Push the amount of elements in the SWORD array
+	push eax								; Push the multiplier
+	call multiplyArray
+	call CrlF
 
 	mov edx, OFFSET procedureComplete		; Print message and go to menu
 	call WriteString
@@ -124,14 +134,16 @@ populateRandomArray PROC
 ;    [EBP + 12] = offset of the array
 ;***************************************************************
 .code
-	ENTER 2, 0								; Create the proc. anchor
+	ENTER 8, 0								; Create the proc. anchor
 	mov esi, [EBP + 12]						; ESI contains the offset of the array
+	mov DWORD PTR[EBP-4], 2500				; Create local variables
+	mov DWORD PTR[EBP-8], -1500
 
 ;	*** Generate the random number and store it in the array ***
 	mov ecx, [EBP + 8]						; Loop for the length of the array
 praLoop1:
-	mov eax, 2500							; EAX = high number
-	mov ebx, -1500							; EBX = low number
+	mov eax, [EBP - 4]						; EAX = high number
+	mov ebx, [EBP - 8]						; EBX = low number
 	sub eax, ebx
 	inc eax
 	call RandomRange
@@ -147,15 +159,37 @@ populateRandomArray ENDP
 
 
 ;***************************************************************
-multiplyArray PROC
+; CONDITIONS: The number cannot create a result > size of WORD
+multiplyArray PROC;,
+;	multiplyAmnt :  SDWORD,
+;	arrayLength	 :  SDWORD,
+;	arrayOffset  :  PTR SDWORD
 ;	RECEIVES: Stack Var1: Offset of the SWORD array
-;			  Stack Var2: Multiplier
+;			  Stack Var2: Number of elements in the array
+;			  Stack Var3: Multiplier
 ;	 RETURNS: Nothing
+;    [EBP + 8]  = Multiplier amount
+;	 [EBP + 12] = length of the array
+;    [EBP + 16] = offset of the array
 ;***************************************************************
 .code
 	push ebp								; Create the proc. anchor
 	mov ebp, esp
 	
+	mov esi, [EBP + 16] 					; ESI contains the offset of the array
+;	mov esi, [arrayOffset]					; ESI contains the offset of the array
+
+;	*** Multiply every element by the multiplier and store it ***
+	mov ecx, [EBP + 12]						; Loop for the length of the array
+;	mov ecx, arrayLength					; Loop for the length of the array
+maLoop1:
+	mov ax, [EBP + 8]						; ax contains the multiplier
+;	mov ax, SWORD PTR multiplyAmnt			; ax contains the multiplier
+	imul SWORD PTR[esi]						; Multiply the current element by the user multiplier
+	
+	mov [esi], ax							; Put ax into the WORD array
+	add esi, TYPE WORD						; Go to the next element
+	loop maLoop1
 
 	pop ebp									; Remove the proc. anchor
 	ret
