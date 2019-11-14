@@ -95,12 +95,15 @@ option3:
 	call ReadInt
 
 	mov esi, OFFSET array
-	mov ebx, [esi]							; Move the value into ebx
-	push ebx								; Push current array element
-	push eax								; Push the divisor
-	call divideArray
+	mov eax, [esi]							; Move the value into ebx
 	call WriteInt
 	call CrlF
+
+	;push ebx								; Push current array element
+	;push eax								; Push the divisor
+	;call divideArray
+	;call WriteInt
+	;call CrlF
 	;mov [esi], eax							; Move the divided number back into the array
 	;add esi, TYPE array
 
@@ -193,7 +196,7 @@ maLoop1:
 	add esi, TYPE WORD						; Go to the next element
 	loop maLoop1
 
-	ret 12
+	ret
 
 multiplyArray ENDP
 
