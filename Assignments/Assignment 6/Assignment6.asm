@@ -268,6 +268,7 @@ L2:
 
 	POPFD
 	POPAD
+
 	ret
 printArrayInt ENDP
 
