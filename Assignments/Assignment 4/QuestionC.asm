@@ -57,7 +57,7 @@ main PROC
 
 ;	****** Place the character at 500 locations ******
 	mov ebx, 0											; The lowest possible range for X and Y, and colour is 0
-	mov ecx, 500
+	mov ecx, 50000
 L1:
 	call GetMaxXY										; AX = num of rows, DX = number of columns
 	call BetterRandomRange
@@ -79,8 +79,8 @@ L1:
 	call SetConsoleColours
 
 ;	*** Delay the loop ***
-	mov eax, 200										; Delay by 1/5th of a second
-	call Delay
+	;mov eax, 200										; Delay by 1/5th of a second
+	;call Delay
 
 	loop L1
 
