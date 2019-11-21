@@ -1,31 +1,266 @@
 TITLE PartA.asm
 ;***************************************************************
 ; -Michael Buffone
-; -October 11th, 2019
-; -COSC2406A19F Assignment 7, Question A
+; -November 20th, 2019
+; -COSC2406A19F Assignment 7
 
-; -This program will read an integer, store it into a DWORD, 
-;  and compute operations based on that input
+; -This program will read an edge length and utilize FPU
 ;***************************************************************
 INCLUDE Irvine32.inc
 
 .data
 
+; Constants
+one DWORD 1
+two DWORD 2
+three DWORD 3
+four DWORD 4
+five DWORD 5
+ten DWORD 10
+eleven DWORD 11
+twFive DWORD 25
+twNine DWORD 29
+thirty DWORD 30
+sixty DWORD 60
+
+; Data
+edgeLength			REAL4 ?
+rhomArea			REAL4 ?
+rhomVolume			REAL4 ?
+circumRad			REAL4 ?
+midsphereRad		REAL4 ?
+sphereVolume		REAL4 ?
+
+; Square roots
+rootThree			REAL4 ?		; root(3)
+rootFive			REAL4 ?		; root(5)
+areaRoot			REAL4 ?		; root(25 + 10*root(5))
+circumRoot			REAL4 ?		; root(11 + 4*root(5))
+midsphereRoot		REAL4 ?		; root(10 + 4*root(5))
+
+; Prompts
+edgeLengthMsg		BYTE "Enter the length of an edge: ", 0
+rhomAreaMsg			BYTE "  Area of rhombicosidodecahedron: ", 0
+rhomVolumeMsg		BYTE "Volume of rhombicosidodecahedron: ", 0
+circumRadMsg		BYTE "             Circumsphere radius: ", 0
+midsphereRadMsg		BYTE "                Midsphere radius: ", 0
+sphereVolumeMsg		BYTE "FIX THIS ->   Volume of a sphere: ", 0
+
 ;----------Main Code Section------------------------------------
 .code
 main PROC
-	;mov edx, OFFSET pPrompt						; Print msg and collect pVar
+
+;	****** User I/O ******
+	mov edx, OFFSET edgeLengthMsg				; Print msg and collect edge length
+	call WriteString
+	call ReadFloat
+	FSTP edgeLength								; Pop and store the stack in the var
+	call CrlF
+
+;	****** Calculate initial square roots ******
+;	*** root(3) ***
+	FILD three									; Load 3
+	FSQRT
+	FSTP rootThree								; Store root answer
+
+;	*** root(5) ***
+	FILD five									; Load 5
+	FSQRT
+	FSTP rootFive								; Store root answer
+
+;	*** root(25 + 10*root(5)) ***
+	FILD ten									; Load 10
+	FMUL rootFive								; Multiply root 5
+	FILD twFive									; Load 25
+	FADD										; Add 25 to the 10*root(5)
+	FSQRT										; Root the result
+	FSTP areaRoot								; Store the root(result) in areaRoot
+
+;	*** root(11 + 4*root(5)) ***	
+	FILD four									; Load 4
+	FMUL rootFive								; Multiply root 5
+	FILD eleven									; Load 11
+	FADD										; Add 11 to the 4*root(5)
+	FSQRT										; Root the result
+	FSTP circumRoot								; Store the root(result) in circumRoot
+
+;	*** root(10 + 4*root(5)) ***	
+	FILD four									; Load 4
+	FMUL rootFive								; Multiply root 5
+	FILD ten									; Load 10
+	FADD										; Add 10 to the 4*root(5)
+	FSQRT										; Root the result
+	FSTP midsphereRoot							; Store the root(result) in midsphereRoot
+
+;	****** Call calculation functions ******
+	call calcRhomArea
+	call calcRhomVol
+	call calcCircumRad
+	call calcMidsphereRad
+	call calcSphereVol
+
+;	****** Write the output ******
+	mov edx, OFFSET rhomAreaMsg					; Write and print rhomArea information
+	call WriteString
+	FLD rhomArea
+	call WriteFloat
+	call CrlF
+
+	mov edx, OFFSET rhomVolumeMsg				; Write and print rhomVolume information
+	call WriteString
+	FLD rhomVolume
+	call WriteFloat
+	call CrlF
+
+	mov edx, OFFSET circumRadMsg				; Write and print circumRad information
+	call WriteString
+	FLD circumRad
+	call WriteFloat
+	call CrlF
+
+	mov edx, OFFSET midsphereRadMsg				; Write and print midsphereRad information
+	call WriteString
+	FLD midsphereRad
+	call WriteFloat
+	call CrlF
+
+	mov edx, OFFSET sphereVolumeMsg				; Write and print sphereVolume information
+	call WriteString
+	FLD sphereVolume
+	call WriteFloat
+	call CrlF
+
+	call showFPUstack
+	call CrlF
+	exit
 main ENDP
 
-;***************************************************************
-; printArray PROC
-;	RECEIVES: ESI = offset of the source array
-;			  EBX = type of the source
-;			  ECX = number of elements in the source
-;***************************************************************
-;.data
 
-;.code
+;***************************************************************
+calcRhomArea PROC
+;	RECEIVES: Nothing
+;	 RETURNS: Answer in rhomArea
+;***************************************************************
+.code
+;	5 * root(3)
+	FILD five									; Load 5
+	FMUL rootThree								; 5 * root(3)
 
-;printArray ENP
+;	3 * areaRoot
+	FILD three									; Load 3
+	FLD areaRoot								; Load areaRoot
+	FMUL										; Multiply st(0), st(1)
+
+;   30 + 5*root(3) + 3 * areaRoot
+	FILD thirty									; Load 30 and add the entire stack together
+	FADD	
+	FADD
+
+;	Stack answer * edgeLength^2
+	FLD edgeLength								; Load the edge length twice
+	FLD edgeLength
+	FMUL										; Square the edge length
+	FMUL										; Multiply the stack answer by the edge^2
+	FSTP rhomArea								; Store the result in rhomArea
+
+	ret
+calcRhomArea ENDP
+
+
+;***************************************************************
+calcRhomVol PROC
+;	RECEIVES: Nothing
+;	 RETURNS: Answer in rhomVolume
+;***************************************************************
+.code
+;	60 + 29 * root(5)
+	FILD twNine									; Load 29
+	FMUL rootFive								; 29 * root(5)
+	FILD sixty									; Load 60
+	FADD										; Add the answer
+
+;	1 / 3 * result
+	FILD one									; Load 1
+	FILD three									; Load 3
+	FDIV										; 1 / 3 * result
+	FMUL										
+
+;	Result * edgeLength^3
+	FLD edgeLength								; Load edgeLength 3 times
+	FLD edgeLength
+	FLD edgeLength
+	FMUL										; edgeLength ^ 2
+	FMUL										; edgeLength ^ 3
+	FMUL										; Result  * edgeLength ^ 3
+	FSTP rhomVolume								; Store the result in rhomVolume
+
+	ret
+calcRhomVol ENDP
+
+
+;***************************************************************
+calcCircumRad PROC
+;	RECEIVES: Nothing
+;	 RETURNS: Answer in circumRad
+;***************************************************************
+.code
+;	1 / 2 * edgeLength * circumRoot
+	FILD one									; Load 1
+	FILD two									; Load 2
+	FDIV										; 1 / 2
+	FLD edgeLength								; Load edge length
+	FMUL										
+	FLD circumRoot								; Load the circumRoot
+	FMUL										
+	FSTP circumRad								; Store the result in circumRad
+
+	ret
+calcCircumRad ENDP
+
+
+;***************************************************************
+calcMidsphereRad PROC
+;	RECEIVES: Nothing
+;	 RETURNS: Answer in midsphereRad
+;***************************************************************
+.code
+;	1 / 2 * edgeLength * midsphereRoot
+	FILD one									; Load 1
+	FILD two									; Load 2
+	FDIV										; 1 / 2
+	FLD edgeLength								; Load edge length
+	FMUL
+	FLD midsphereRoot							; Load the midsphereRoot
+	FMUL
+	FSTP midsphereRad							; Store the result in midsphereRad
+
+	ret
+calcMidsphereRad ENDP
+
+
+;***************************************************************
+calcSphereVol PROC
+;	RECEIVES: Nothing
+;	 RETURNS: Answer in sphereVolume
+;***************************************************************
+.code
+;	4 / 3 * pi * r^3
+	FILD four									; Load 4
+	FILD three									; Load 3
+	FDIV										; 4 / 3
+	FLDPI										; Load pi
+	FMUL										; 4 / 3 * pi
+	FLD midsphereRad							; Load midsphereRad^3 onto stack
+	FLD midsphereRad
+	FLD midsphereRad
+
+	FMUL										; Calculate midsphereRad^2
+	FMUL										; Calculate midsphereRad^3
+	FMUL										; Calculate 4 / 3 * pi * midpshereRad^3
+
+	FSTP sphereVolume							; Store the result in sphereVolume
+
+	ret
+calcSphereVol ENDP
+
 END main
