@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="PartA.asm" />
     <MASM Include="PartB.asm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
