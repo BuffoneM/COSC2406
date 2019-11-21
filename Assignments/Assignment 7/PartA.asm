@@ -40,24 +40,61 @@ circumRoot					REAL4 ?		; root(11 + 4*root(5))
 midsphereRoot				REAL4 ?		; root(10 + 4*root(5))
 
 ; Prompts
-edgeLengthMsg				BYTE "Enter the length of an edge: ", 0
-rhomAreaMsg					BYTE "  Area of rhombicosidodecahedron: ", 0
-rhomVolumeMsg				BYTE "Volume of rhombicosidodecahedron: ", 0
-circumRadMsg				BYTE "             Circumsphere radius: ", 0
-midsphereRadMsg				BYTE "                Midsphere radius: ", 0
-outterSphereVolumeMsg		BYTE "         Volume of outter sphere: ", 0
-innerSphereVolumeMsg		BYTE "          Volume of inner sphere: ", 0
+invalidLengthMsg			BYTE "Enter a positive edge length... ", 0
+edgeLengthMsg				BYTE "Enter the length of an edge (0 = exit) : ", 0
+rhomAreaMsg					BYTE "Area of rhombicosidodecahedron         : ", 0
+rhomVolumeMsg				BYTE "Volume of rhombicosidodecahedron       : ", 0
+circumRadMsg				BYTE "Circumsphere radius                    : ", 0
+midsphereRadMsg				BYTE "Midsphere radius                       : ", 0
+outterSphereVolumeMsg		BYTE "Volume of outter sphere                : ", 0
+innerSphereVolumeMsg		BYTE "Volume of inner sphere                 : ", 0
 
 ;----------Main Code Section------------------------------------
 .code
 main PROC
 
 ;	****** User I/O ******
+mainL1:
 	mov edx, OFFSET edgeLengthMsg				; Print msg and collect edge length
 	call WriteString
 	call ReadFloat
+
+;	*** Comparing the user input ***
+	FLDZ
+	FCOMP
+	FNSTSW ax
+	SAHF
+	je endProgram								; if(float == 0) exit
+	ja negativeEntered							; if(float < 0) jmp to label
+
 	FSTP edgeLength								; Pop and store the stack in the var
+	call calculateEverything
 	call CrlF
+
+	jmp mainL1
+
+negativeEntered:
+	FFREE st(0)									; Remove the negative number off the stack
+	mov edx, OFFSET invalidLengthMsg			; Print invalid length msg
+	call WriteString
+	call CrlF
+	call CrlF
+	jmp mainL1
+
+endProgram:	
+	FFREE st(0)									; Remove the zero off the stack
+	call showFPUstack
+	exit
+
+main ENDP
+
+
+;***************************************************************
+calculateEverything PROC
+;	RECEIVES: Nothing
+;	 RETURNS: Nothing
+;***************************************************************
+.code
 
 ;	****** Calculate initial square roots ******
 ;	*** root(3) ***
@@ -108,41 +145,45 @@ main PROC
 	FLD rhomArea
 	call WriteFloat
 	call CrlF
+	FFREE st(0)
 
 	mov edx, OFFSET rhomVolumeMsg				; Write and print rhomVolume information
 	call WriteString
 	FLD rhomVolume
 	call WriteFloat
 	call CrlF
+	FFREE st(0)
 
 	mov edx, OFFSET circumRadMsg				; Write and print circumRad information
 	call WriteString
 	FLD circumRad
 	call WriteFloat
 	call CrlF
+	FFREE st(0)
 
 	mov edx, OFFSET midsphereRadMsg				; Write and print midsphereRad information
 	call WriteString
 	FLD midsphereRad
 	call WriteFloat
 	call CrlF
+	FFREE st(0)
 
 	mov edx, OFFSET outterSphereVolumeMsg		; Write and print outterSphereVolume information
 	call WriteString
 	FLD outterSphereVolume
 	call WriteFloat
 	call CrlF
+	FFREE st(0)
 
 	mov edx, OFFSET innerSphereVolumeMsg		; Write and print outterSphereVolume information
 	call WriteString
 	FLD innerSphereVolume
 	call WriteFloat
 	call CrlF
+	FFREE st(0)
 
-	call showFPUstack
-	call CrlF
-	exit
-main ENDP
+	ret
+calculateEverything ENDP
 
 
 ;***************************************************************
