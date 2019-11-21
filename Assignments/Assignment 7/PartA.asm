@@ -24,27 +24,29 @@ thirty DWORD 30
 sixty DWORD 60
 
 ; Data
-edgeLength			REAL4 ?
-rhomArea			REAL4 ?
-rhomVolume			REAL4 ?
-circumRad			REAL4 ?
-midsphereRad		REAL4 ?
-sphereVolume		REAL4 ?
+edgeLength					REAL4 ?
+rhomArea					REAL4 ?
+rhomVolume					REAL4 ?
+circumRad					REAL4 ?
+midsphereRad				REAL4 ?
+outterSphereVolume			REAL4 ?
+innerSphereVolume			REAL4 ?
 
 ; Square roots
-rootThree			REAL4 ?		; root(3)
-rootFive			REAL4 ?		; root(5)
-areaRoot			REAL4 ?		; root(25 + 10*root(5))
-circumRoot			REAL4 ?		; root(11 + 4*root(5))
-midsphereRoot		REAL4 ?		; root(10 + 4*root(5))
+rootThree					REAL4 ?		; root(3)
+rootFive					REAL4 ?		; root(5)
+areaRoot					REAL4 ?		; root(25 + 10*root(5))
+circumRoot					REAL4 ?		; root(11 + 4*root(5))
+midsphereRoot				REAL4 ?		; root(10 + 4*root(5))
 
 ; Prompts
-edgeLengthMsg		BYTE "Enter the length of an edge: ", 0
-rhomAreaMsg			BYTE "  Area of rhombicosidodecahedron: ", 0
-rhomVolumeMsg		BYTE "Volume of rhombicosidodecahedron: ", 0
-circumRadMsg		BYTE "             Circumsphere radius: ", 0
-midsphereRadMsg		BYTE "                Midsphere radius: ", 0
-sphereVolumeMsg		BYTE "FIX THIS ->   Volume of a sphere: ", 0
+edgeLengthMsg				BYTE "Enter the length of an edge: ", 0
+rhomAreaMsg					BYTE "  Area of rhombicosidodecahedron: ", 0
+rhomVolumeMsg				BYTE "Volume of rhombicosidodecahedron: ", 0
+circumRadMsg				BYTE "             Circumsphere radius: ", 0
+midsphereRadMsg				BYTE "                Midsphere radius: ", 0
+outterSphereVolumeMsg		BYTE "         Volume of outter sphere: ", 0
+innerSphereVolumeMsg		BYTE "          Volume of inner sphere: ", 0
 
 ;----------Main Code Section------------------------------------
 .code
@@ -97,7 +99,8 @@ main PROC
 	call calcRhomVol
 	call calcCircumRad
 	call calcMidsphereRad
-	call calcSphereVol
+	call calcOutterSphereVol
+	call calcInnerSphereVol
 
 ;	****** Write the output ******
 	mov edx, OFFSET rhomAreaMsg					; Write and print rhomArea information
@@ -124,9 +127,15 @@ main PROC
 	call WriteFloat
 	call CrlF
 
-	mov edx, OFFSET sphereVolumeMsg				; Write and print sphereVolume information
+	mov edx, OFFSET outterSphereVolumeMsg		; Write and print outterSphereVolume information
 	call WriteString
-	FLD sphereVolume
+	FLD outterSphereVolume
+	call WriteFloat
+	call CrlF
+
+	mov edx, OFFSET innerSphereVolumeMsg		; Write and print outterSphereVolume information
+	call WriteString
+	FLD innerSphereVolume
 	call WriteFloat
 	call CrlF
 
@@ -239,7 +248,33 @@ calcMidsphereRad ENDP
 
 
 ;***************************************************************
-calcSphereVol PROC
+calcOutterSphereVol PROC
+;	RECEIVES: Nothing
+;	 RETURNS: Answer in sphereVolume
+;***************************************************************
+.code
+;	4 / 3 * pi * r^3
+	FILD four									; Load 4
+	FILD three									; Load 3
+	FDIV										; 4 / 3
+	FLDPI										; Load pi
+	FMUL										; 4 / 3 * pi
+	FLD circumRad								; Load circumRad^3 onto stack
+	FLD circumRad
+	FLD circumRad
+
+	FMUL										; Calculate circumRad^2
+	FMUL										; Calculate circumRad^3
+	FMUL										; Calculate 4 / 3 * pi * circumRad^3
+
+	FSTP outterSphereVolume						; Store the result in outterSphereVolume
+
+	ret
+calcOutterSphereVol ENDP
+
+
+;***************************************************************
+calcInnerSphereVol PROC
 ;	RECEIVES: Nothing
 ;	 RETURNS: Answer in sphereVolume
 ;***************************************************************
@@ -256,11 +291,11 @@ calcSphereVol PROC
 
 	FMUL										; Calculate midsphereRad^2
 	FMUL										; Calculate midsphereRad^3
-	FMUL										; Calculate 4 / 3 * pi * midpshereRad^3
+	FMUL										; Calculate 4 / 3 * pi * midsphereRad^3
 
-	FSTP sphereVolume							; Store the result in sphereVolume
+	FSTP innerSphereVolume						; Store the result in innerSphereVolume
 
 	ret
-calcSphereVol ENDP
+calcInnerSphereVol ENDP
 
 END main
