@@ -18,9 +18,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <MASM Include="PartB.asm" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{107AF0B6-6614-4FC5-B23F-9DD023D5FCFB}</ProjectGuid>
