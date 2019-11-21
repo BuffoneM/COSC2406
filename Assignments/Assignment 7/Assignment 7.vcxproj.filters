@@ -18,5 +18,8 @@
     <MASM Include="PartA.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="PartB.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

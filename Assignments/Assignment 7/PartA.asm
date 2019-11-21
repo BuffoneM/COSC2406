@@ -2,7 +2,7 @@ TITLE PartA.asm
 ;***************************************************************
 ; -Michael Buffone
 ; -November 20th, 2019
-; -COSC2406A19F Assignment 7
+; -COSC2406A19F Assignment 7, Part A
 
 ; -This program will read an edge length and utilize FPU
 ;***************************************************************
