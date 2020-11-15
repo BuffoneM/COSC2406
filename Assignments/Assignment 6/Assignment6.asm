@@ -1,8 +1,6 @@
 TITLE Assignment6.asm
 ;***************************************************************
-; -Michael Buffone
 ; -November 11th, 2019
-; -COSC2406A19F Assignment 6
 
 ; -This program will read an integer, store it into a DWORD, 
 ;  and compute operations based on that input
